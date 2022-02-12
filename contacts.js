@@ -23,6 +23,10 @@ async function listContacts() {
 async function getContactById(contactId) {
   const contacts = await getContacts();
   const contact = contacts.find((contact) => contact.id === contactId);
+  if (!contact) {
+    console.log(`Contact with id#${contactId} was not found`);
+    return null;
+  }
   console.log(contact);
   return contact;
 }

@@ -2,11 +2,11 @@ const path = require("path");
 const fs = require("fs").promises;
 const contactsPath = path.resolve("db/contacts.json");
 
-// TODO: задокументировать каждую функцию
 async function getContacts() {
   const contacts = await fs.readFile(contactsPath, "utf-8");
   return JSON.parse(contacts);
 }
+
 async function writeContacts(newContacts) {
   try {
     const contacts = JSON.stringify(newContacts);
@@ -15,6 +15,7 @@ async function writeContacts(newContacts) {
     return error;
   }
 }
+
 async function listContacts() {
   const contacts = await getContacts();
   console.table(contacts);

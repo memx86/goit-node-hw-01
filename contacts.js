@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs").promises;
+const { nanoid } = require("nanoid");
 const contactsPath = path.resolve("db/contacts.json");
 
 async function getContacts() {
@@ -9,7 +10,7 @@ async function getContacts() {
 
 async function writeContacts(newContacts) {
   try {
-    const contacts = JSON.stringify(newContacts);
+    const contacts = JSON.stringify(newContacts, null, 2);
     await fs.writeFile(contactsPath, contacts, "utf-8");
   } catch (error) {
     return error;
@@ -34,10 +35,18 @@ async function getContactById(contactId) {
 
 async function removeContact(contactId) {
   const contacts = await getContacts();
+  const deletedContact = contacts.find((contact) => contact.id === contactId);
+
+  if (!deletedContact) {
+    console.log(`Contact with id#${contactId} not found`);
+    return null;
+  }
+
   const newContacts = contacts.filter((contact) => contact.id !== contactId);
   try {
     await writeContacts(newContacts);
     console.log(`Contact with id#${contactId} was succesfully removed`);
+    return deletedContact;
   } catch (error) {
     console.error(error);
   }
@@ -45,11 +54,13 @@ async function removeContact(contactId) {
 
 async function addContact(name, email, phone) {
   const contacts = await getContacts();
-  const id = String(Number(contacts.at(-1).id) + 1);
-  const newContacts = [...contacts, { id, name, email, phone }];
+  const id = nanoid();
+  const newContact = { id, name, email, phone };
+  const newContacts = [...contacts, newContact];
   try {
     await writeContacts(newContacts);
     console.log(`Contact was succesfully added, id#${id}`);
+    return newContact;
   } catch (error) {
     console.error(error);
   }
